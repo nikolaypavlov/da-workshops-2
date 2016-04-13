@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Data Analysis with R</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Data Analysis with R">
+  <meta name="author" content="Mykola Pavlov">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Data Analysis with R</h1>
+    <h2>Exploratory Statistics</h2>
+    <p>Mykola Pavlov<br/>Data Scientist at Azzurro.io</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Course Logistic</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Every Wednesday 19:00 - 21:00</li>
+<li>Slides: <a href="http://nikolaypavlov.github.io/da-workshops-2/">http://nikolaypavlov.github.io/da-workshops-2/</a></li>
+<li>Skype Chat: <a href="https://join.skype.com/gjN0CfAd4bhg">https://join.skype.com/gjN0CfAd4bhg</a></li>
+<li>Reference Book: <a href="https://www.openintro.org/stat/textbook.php">https://www.openintro.org/stat/textbook.php</a></li>
+<li>ggplot2 Documentation: <a href="http://docs.ggplot2.org">http://docs.ggplot2.org</a></li>
+<li>Install the following packages: openintro, ggplot2, grid</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Topics</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Objectives</li>
+<li>How Does a Plot Get Created? (Special topic)</li>
+<li>Scatterplot</li>
+<li>Dotplot, Distribution, Mean</li>
+<li>Histogram, Variance, Standard Deviation, Skew, Mode</li>
+<li>Box plots, quartiles, median, IQR</li>
+<li>Data transformation (Special topic)</li>
+<li>Bar plots, contingency tables, proportions</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>Objectives of exploratory data analysis</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Get understanding of the data</li>
+<li>Reveal structure and patterns</li>
+<li>Consider some models &quot;to try next&quot;</li>
+<li>Debug</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>How Does a Plot Get Created?</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>R creates plot on specific graphics device:</p>
+
+<ul>
+<li>Screen device: quartz(), windows(), x11().</li>
+<li>File device: PDF, PNG, JPEG, SVG...</li>
+</ul>
+
+<p>By default plot() in base, xyplot() in lattice, or qplot() in ggplot2 use screen device.</p>
+
+<p>Try help(Devices) for more information</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <hgroup>
+    <h2>Example</h2>
+  </hgroup>
+  <article data-timings="">
+    <ol>
+<li>Open PNG device</li>
+<li>Create plot, send to a file</li>
+<li>Annotate</li>
+<li>Close device</li>
+</ol>
+
+<pre><code class="r">png(file = &quot;email.png&quot;)
+plot(num_char ~ line_breaks, data=email)
+title(main = &quot;Number of lines versus number of characters in email&quot;) 
+dev.off()
+</code></pre>
+
+<pre><code>## quartz_off_screen 
+##                 2
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-6" style="background:;">
+  <hgroup>
+    <h2>ggplot2 basic principles</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>An implementaon of the Grammar of Graphics by Leland Wilkinson</p>
+
+<p>Describe a statistical plot in several consecutive steps: </p>
+
+<ul>
+<li>data (data frame)</li>
+<li>aesthetic mappings (size, shape, color...)</li>
+<li>geometric objects (points, lines, polygon...)</li>
+<li>scales</li>
+<li>facet specification</li>
+<li>statistical transformations</li>
+<li>the coordinate system </li>
+</ul>
+
+<p>Together, the data, aes, stat transform and geom form a Layer</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-7" style="background:;">
+  <hgroup>
+    <h2>Scatterplot</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(ggplot2)
+qplot(num_char, line_breaks, data=email50, geom=&quot;point&quot;,
+      xlab=&quot;Number of Characters (in thousands)&quot;, ylab=&quot;Number of Lines&quot;)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-3-1.png" alt="plot of chunk unnamed-chunk-3"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-8" style="background:;">
+  <hgroup>
+    <h2>Exercise</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Does the HTML format affect the size of email?</p>
+
+<p>Add color or facet to prevous plot.</p>
+
+<p>Useful arguments and functions: color, facets, factor(), help(qplot) </p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-9" style="background:;">
+  <hgroup>
+    <h2>Dotplot, mean, distribution</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">p &lt;- ggplot(email50, mapping=aes(x=num_char)) + 
+  geom_dotplot(binwidth = 1.5, method=&quot;histodot&quot;) + 
+  geom_point(data=data.frame(x=mean(email50$num_char), y=-0.1), 
+             aes(x, y), colour=&quot;red&quot;, size=8, shape=17) + 
+  geom_hline(yintercept=0, size=1, color=&quot;black&quot;) +
+  scale_x_continuous(name =&quot;Number of characters (in thousands)&quot;) + 
+  scale_y_continuous(name = &quot;&quot;, breaks = NULL)
+p
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-4-1.png" alt="plot of chunk unnamed-chunk-4"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-10" style="background:;">
+  <hgroup>
+    <h2>Histogram, variance, standard deviation</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">p &lt;- ggplot(email, mapping=aes(x=num_char)) + 
+  geom_histogram(binwidth=5) +
+  geom_vline(xintercept=mean(email$num_char), linetype=&quot;dashed&quot;, colour=&quot;red&quot;, size=1) +
+  scale_x_continuous(name=&quot;Number of characters (in thousands)&quot;)
+p
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-5-1.png" alt="plot of chunk unnamed-chunk-5"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-11" style="background:;">
+  <hgroup>
+    <h2>Box plots, quartiles, median, IQR</h2>
+  </hgroup>
+  <article data-timings="">
+    <p><img src="assets/img/boxplot.png" alt="Boxplot"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-12" style="background:;">
+  <hgroup>
+    <h2>Exercise</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Create boxplot of the num_char var using ggplot2</h3>
+
+<ul>
+<li>Set appropriate Y axis label</li>
+<li>Clean up X axis, set limits, remove breaks</li>
+<li>Fill box with color</li>
+<li>Set main title for the plot</li>
+</ul>
+
+<h3>Get the summary statistics of the num_char var</h3>
+
+<p>Try summary() function</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-13" style="background:;">
+  <hgroup>
+    <h2>Transformations (special topic)</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Reasons:</h3>
+
+<ul>
+<li>Easy to visualize and understand</li>
+<li>Stat/ML algorithm requirement</li>
+<li>Domain standard</li>
+</ul>
+
+<p>Some common transforms: log, square root, inverse, power (Box-Cox), z-norm, Fourier</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-14" style="background:;">
+  <hgroup>
+    <h2>Example Log transformation</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(grid)
+p1 &lt;- qplot(pop2000, pop2010, data=county, xlab=&quot;Population in 2000&quot;, ylab=&quot;Population in 2010&quot;, na.rm=T)
+p2 &lt;- qplot(log(pop2000), log(pop2010), data=county, 
+            xlab=&quot;Population in 2000, log-scaling&quot;, ylab=&quot;Population in 2010, log-scaling&quot;, na.rm=T)
+pushViewport(viewport(layout = grid.layout(1, 2))) 
+print(p1, vp = viewport(layout.pos.row = 1, layout.pos.col = 1)) 
+print(p2, vp = viewport(layout.pos.row = 1, layout.pos.col = 2)) 
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-7-1.png" alt="plot of chunk unnamed-chunk-7"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-15" style="background:;">
+  <hgroup>
+    <h2>Contingency tables, proportions and bar plots</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Frequency table</h3>
+
+<pre><code class="r">num_freq_table &lt;- table(email$number)
+addmargins(num_freq_table, 1)
+</code></pre>
+
+<pre><code>## 
+##  none small   big   Sum 
+##   549  2827   545  3921
+</code></pre>
+
+<pre><code class="r">spam_freq_table &lt;- table(email$spam)
+addmargins(spam_freq_table, 1)
+</code></pre>
+
+<pre><code>## 
+##    0    1  Sum 
+## 3554  367 3921
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-16" style="background:;">
+  <hgroup>
+    <h2>Bar plots</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">qplot(number, data=email, geom=&quot;bar&quot;)
+</code></pre>
+
+<p><img src="assets/fig/unnamed-chunk-10-1.png" alt="plot of chunk unnamed-chunk-10"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-17" style="background:;">
+  <hgroup>
+    <h2>Contingency table</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">ctable &lt;- table(email$spam, email$number, dnn=c(&quot;Spam&quot;, &quot;Number&quot;))
+addmargins(ctable)
+</code></pre>
+
+<pre><code>##      Number
+## Spam  none small  big  Sum
+##   0    400  2659  495 3554
+##   1    149   168   50  367
+##   Sum  549  2827  545 3921
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-18" style="background:;">
+  <hgroup>
+    <h2>Proportions</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Row proportions</h3>
+
+<pre><code class="r">prop.table(ctable, 1)
+</code></pre>
+
+<pre><code>##     Number
+## Spam      none     small       big
+##    0 0.1125492 0.7481711 0.1392797
+##    1 0.4059946 0.4577657 0.1362398
+</code></pre>
+
+<h3>Column proportions</h3>
+
+<pre><code class="r">prop.table(ctable, 2)
+</code></pre>
+
+<pre><code>##     Number
+## Spam       none      small        big
+##    0 0.72859745 0.94057305 0.90825688
+##    1 0.27140255 0.05942695 0.09174312
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-19" style="background:;">
+  <hgroup>
+    <h2>Exercise</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>What does 0.457 represent in the row proportions table? </li>
+<li>What does 0.059 represent in the column proportions table?</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-20" style="background:;">
+  <hgroup>
+    <h2>Homework</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li><a href="http://htmlpreview.github.io/?https://github.com/andrewpbray/oiLabs-base-R/blob/master/intro_to_data/intro_to_data.html">Lab 1 - Introduction to data</a></li>
+<li>Skype Chat for discussions: <a href="https://join.skype.com/gjN0CfAd4bhg">https://join.skype.com/gjN0CfAd4bhg</a></li>
+<li>Reading: OpenIntro Statistics Chapter 1, p. 1.6 till the end of chapter</li>
+<li>ggplot2 Docs: <a href="http://docs.ggplot2.org/">http://docs.ggplot2.org/</a></li>
+<li><a href="http://byrneslab.net/classes/biol607/readings/wickham_layered-grammar.pdf">A Layered Grammar of Graphics by Hadley Wickham</a></li>
+<li>Reference Book: <a href="https://www.openintro.org/stat/textbook.php">https://www.openintro.org/stat/textbook.php</a></li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Course Logistic'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Topics'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Objectives of exploratory data analysis'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='How Does a Plot Get Created?'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title='Example'>
+         5
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=6 title='ggplot2 basic principles'>
+         6
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=7 title='Scatterplot'>
+         7
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=8 title='Exercise'>
+         8
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=9 title='Dotplot, mean, distribution'>
+         9
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=10 title='Histogram, variance, standard deviation'>
+         10
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=11 title='Box plots, quartiles, median, IQR'>
+         11
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=12 title='Exercise'>
+         12
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=13 title='Transformations (special topic)'>
+         13
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=14 title='Example Log transformation'>
+         14
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=15 title='Contingency tables, proportions and bar plots'>
+         15
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=16 title='Bar plots'>
+         16
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=17 title='Contingency table'>
+         17
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=18 title='Proportions'>
+         18
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=19 title='Exercise'>
+         19
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=20 title='Homework'>
+         20
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
